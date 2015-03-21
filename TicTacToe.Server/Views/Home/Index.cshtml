@@ -9,7 +9,7 @@
     <title>Tic-Tac-Toe</title>
 
     <!-- Bootstrap -->
-    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -48,7 +48,7 @@
     <main class="container text-center">
         <h1>Tic-Tac-Toe</h1>
         <input id="username" type="text" autofocus />
-        <input id="join" class="btn btn-primary" type="submit" value="Join" />
+        <input id="findGame" class="btn btn-primary" type="submit" value="Find Game" />
         <p id="status">Please enter your desired username.</p>
 
         <div id="board">
@@ -75,8 +75,25 @@
     </main>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="~/Scripts/jquery-1.9.1.min.js"></script>
+    <script src="~/Scripts/jquery-1.9.1.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <!-- SignalR references must be in this order (include jquery first) -->
+    <script src="~/Scripts/jquery.signalR-2.2.0.js"></script>
+    <script src="~/signalr/hubs"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            // by default the FindGame button should be disabled until a connection to the Hub is made
+            $('#findGame').attr('disabled', 'disabled');
+        });
+
+        // connect to the hub
+        $.connection.hub.logging = true; // Enable client side logging
+        $.connection.hub.start().done(function () {
+            // Enable the find game button
+            $('#findGame').removeAttr('disabled');
+        });
+    </script>
 </body>
 </html>
