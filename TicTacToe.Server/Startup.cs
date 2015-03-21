@@ -4,7 +4,6 @@ using Microsoft.Owin;
 using Owin;
 
 [assembly: OwinStartup(typeof(TicTacToe.Server.Startup))]
-
 namespace TicTacToe.Server
 {
     public class Startup
