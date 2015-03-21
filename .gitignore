@@ -1,3 +1,15 @@
+[Oo]bj/
+[Bb]in/
+*.user
+/TestResults
+*.vspscc
+*.vssscc
 *.suo
-bin
-obj
+*.cache
+*.csproj.user
+packages/*
+App_Data/
+/apps
+msbuild.log
+_app/
+nuget.exe
