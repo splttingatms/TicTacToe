@@ -72,7 +72,7 @@ namespace TicTacToe.Server
         /// </summary>
         /// <param name="playerId">The unique identifier of the player to find.</param>
         /// <returns>The found player; otherwise null.</returns>
-        internal Player GetPlayer(string playerId)
+        public Player GetPlayer(string playerId)
         {
             return this.players[playerId];
         }
@@ -83,7 +83,7 @@ namespace TicTacToe.Server
         /// <param name="playerId">The player in the game.</param>
         /// <param name="opponent">The opponent of the player if there is one; otherwise null.</param>
         /// <returns>The game that the specified player is a member of if game is found; otherwise null.</returns>
-        internal Game GetGame(Player player, out Player opponent)
+        public Game GetGame(Player player, out Player opponent)
         {
             opponent = null;
             Game foundGame = this.games.Values.FirstOrDefault(g => g.Id == player.GameId);
@@ -104,7 +104,8 @@ namespace TicTacToe.Server
         /// Forgets the specified game. Use if the game is over.
         /// </summary>
         /// <param name="gameId">The unique identifier of the game.</param>
-        internal void RemoveGame(string gameId)
+        /// <returns>A task to track the asynchronous method execution.</returns>
+        public async Task RemoveGame(string gameId)
         {
             // Remove the game
             Game foundGame;
@@ -114,8 +115,8 @@ namespace TicTacToe.Server
             }
 
             // Remove the players from the group
-            this.Groups.Remove(foundGame.Player1.Id, foundGame.Id);
-            this.Groups.Remove(foundGame.Player2.Id, foundGame.Id);
+            await this.Groups.Remove(foundGame.Player1.Id, foundGame.Id);
+            await this.Groups.Remove(foundGame.Player2.Id, foundGame.Id);
 
             // Remove the players, best effort
             Player foundPlayer;

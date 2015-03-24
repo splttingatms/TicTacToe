@@ -38,7 +38,7 @@ namespace TicTacToe.Server
             if (ongoingGame != null)
             {
                 this.Clients.Group(ongoingGame.Id).opponentLeft();
-                GameState.Instance.RemoveGame(ongoingGame.Id);
+                await GameState.Instance.RemoveGame(ongoingGame.Id);
             }
             
             await base.OnDisconnected(stopCalled);
