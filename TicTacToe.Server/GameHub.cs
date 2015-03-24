@@ -11,6 +11,7 @@ namespace TicTacToe.Server
     {
         public async Task FindGame(string username)
         {
+            this.Clients.Caller.playerJoined();
             await Task.Factory.StartNew(() => { });
         }
     }
