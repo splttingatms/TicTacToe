@@ -18,6 +18,12 @@
     <![endif]-->
 
     <style>
+        /* undo bootstrap so that textbox is inline with button */
+        #username {
+            width: initial;
+            display: initial;
+        }
+
         table {
             margin: 0 auto;
             table-layout: fixed;
@@ -45,11 +51,26 @@
     </style>
 </head>
 <body>
+    <script id="board-template" type="text/x-handlebars-template">
+        {{debug}}
+        <table>
+            <tbody>
+                {{#each Pieces}}
+                <tr>
+                    {{#each this}}
+                    <td id="pos-{{@@../index}}-{{@@index}}"></td>
+                    {{/each}}
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </script>
+
     <main class="container text-center">
         <h1>Tic-Tac-Toe</h1>
-        <input id="username" type="text" autofocus />
-        <input id="findGame" class="btn btn-primary" type="submit" value="Find Game" />
-        <p id="status">Please enter your desired username.</p>
+        <input id="username" type="text" class="form-control" placeholder="username" autofocus />
+        <button id="findGame" type="submit" class="btn btn-primary">Find Game</button>
+        <p id="status" class="help-block">Please enter your desired username.</p>
 
         <div id="board">
             <table>
@@ -78,21 +99,27 @@
     <script src="~/Scripts/jquery-1.9.1.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Scripts/handlebars.js"></script>
     <!-- SignalR references must be in this order (include jquery first) -->
     <script src="~/Scripts/jquery.signalR-2.2.0.js"></script>
     <script src="~/signalr/hubs"></script>
 
     <script type="text/javascript">
         $(function () {
+            Handlebars.registerHelper("debug", function () {
+                console.log("Current Context");
+                console.log(this);
+            });
+
             // by default the FindGame button should be disabled until a connection to the Hub is made
             $('#findGame').attr('disabled', 'disabled');
-        });
 
-        // connect to the hub
-        $.connection.hub.logging = true; // Enable client side logging
-        $.connection.hub.start().done(function () {
-            // Enable the find game button
-            $('#findGame').removeAttr('disabled');
+            // connect to the hub
+            $.connection.hub.logging = true; // Enable client side logging
+            $.connection.hub.start().done(function () {
+                // Enable the find game button
+                $('#findGame').removeAttr('disabled');
+            });
         });
     </script>
 </body>
