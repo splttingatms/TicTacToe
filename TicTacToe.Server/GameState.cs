@@ -24,7 +24,7 @@ namespace TicTacToe.Server
             new Lazy<GameState>(() => new GameState(GlobalHost.ConnectionManager.GetHubContext<GameHub>()));
 
         /// <summary>
-        /// A reference to all players. Key is the username of the player.
+        /// A reference to all players. Key is the unique ID of the player.
         /// Note that this collection is concurrent to handle multiple threads.
         /// </summary>
         private readonly ConcurrentDictionary<string, Player> players =
@@ -62,9 +62,65 @@ namespace TicTacToe.Server
         public Player CreatePlayer(string username, string connectionId)
         {
             var player = new Player(username, connectionId);
-            this.players[username] = player;
+            this.players[connectionId] = player;
 
             return player;
+        }
+
+        /// <summary>
+        /// Retrieves the player that has the given ID.
+        /// </summary>
+        /// <param name="playerId">The unique identifier of the player to find.</param>
+        /// <returns>The found player; otherwise null.</returns>
+        internal Player GetPlayer(string playerId)
+        {
+            return this.players[playerId];
+        }
+
+        /// <summary>
+        /// Retrieves the game that the given player is playing in.
+        /// </summary>
+        /// <param name="playerId">The player in the game.</param>
+        /// <param name="opponent">The opponent of the player if there is one; otherwise null.</param>
+        /// <returns>The game that the specified player is a member of if game is found; otherwise null.</returns>
+        internal Game GetGame(Player player, out Player opponent)
+        {
+            opponent = null;
+            Game foundGame = this.games.Values.FirstOrDefault(g => g.Id == player.GameId);
+
+            if (foundGame == null)
+            {
+                return null;
+            }
+
+            opponent = (player.Id == foundGame.Player1.Id) ?
+                foundGame.Player2 :
+                foundGame.Player1;
+
+            return foundGame;
+        }
+
+        /// <summary>
+        /// Forgets the specified game. Use if the game is over.
+        /// </summary>
+        /// <param name="gameId">The unique identifier of the game.</param>
+        internal void RemoveGame(string gameId)
+        {
+            // Remove the game
+            Game foundGame;
+            if (!this.games.TryRemove(gameId, out foundGame))
+            {
+                throw new InvalidOperationException("Game not found.");
+            }
+
+            // Remove the players from the group
+            this.Groups.Remove(foundGame.Player1.Id, foundGame.Id);
+            this.Groups.Remove(foundGame.Player2.Id, foundGame.Id);
+
+            // Remove the players, best effort
+            Player foundPlayer;
+            this.players.TryRemove(foundGame.Player1.Id, out foundPlayer);
+            this.players.TryRemove(foundGame.Player2.Id, out foundPlayer);
         }
     }
 }

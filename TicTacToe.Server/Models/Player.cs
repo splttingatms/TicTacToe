@@ -27,9 +27,15 @@ namespace TicTacToe.Server.Models
         /// </summary>
         public string Id { get; set; }
 
+        /// <summary>
+        /// The unique ID to identify the game a player is playing; otherwise null.
+        /// </summary>
+        public string GameId { get; set; }
+
         public override string ToString()
         {
-            return String.Format("(Id={0}, Name={1})", this.Id, this.Name);
+            return String.Format("(Id={0}, Name={1}, GameId={2})", 
+                this.Id, this.Name, this.GameId);
         }
     }
 }

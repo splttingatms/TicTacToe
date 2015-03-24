@@ -23,5 +23,25 @@ namespace TicTacToe.Server
             this.Clients.Caller.playerJoined();
             await Task.Factory.StartNew(() => { });
         }
+
+        /// <summary>
+        /// A player that is leaving should end all games and notify the opponent.
+        /// </summary>
+        /// <param name="stopCalled"></param>
+        /// <returns></returns>
+        public override async Task OnDisconnected(bool stopCalled)
+        {
+            Player leavingPlayer = GameState.Instance.GetPlayer(playerId: this.Context.ConnectionId);
+
+            Player opponent;
+            Game ongoingGame = GameState.Instance.GetGame(leavingPlayer, out opponent);
+            if (ongoingGame != null)
+            {
+                this.Clients.Group(ongoingGame.Id).opponentLeft();
+                GameState.Instance.RemoveGame(ongoingGame.Id);
+            }
+            
+            await base.OnDisconnected(stopCalled);
+        }
     }
 }

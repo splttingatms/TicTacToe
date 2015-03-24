@@ -102,7 +102,7 @@
     <script src="~/Scripts/handlebars.js"></script>
     <!-- SignalR references must be in this order (include jquery first) -->
     <script src="~/Scripts/jquery.signalR-2.2.0.js"></script>
-    <script src="~/signalr/hubs"></script>
+    <script src="~/signalr/hubs"></script>  
 
     <script type="text/javascript">
         $(function () {
@@ -127,6 +127,12 @@
                 $('#findGame').attr('disabled', 'disabled');
             };
 
+            // The opponent left so game is over
+            gameHub.client.opponentLeft = function () {
+                $('#status').html("Opponent has left. Game over.");
+                endGame();
+            };
+
             // CLIENT BEHAVIORS
             // Call server to find a game if button is clicked
             $('#findGame').click(function () {
@@ -143,6 +149,12 @@
 
                 return true;
             });
+
+            // Game over business logic should disable board button handlers
+            function endGame() {
+                // Remove click handlers from board positions
+                $('td[id^=pos-]').off('click');
+            }
 
             // Open a connection to the server hub
             $.connection.hub.logging = true; // Enable client side logging
