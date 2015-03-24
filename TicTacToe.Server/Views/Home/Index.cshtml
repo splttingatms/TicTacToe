@@ -113,25 +113,38 @@
 
             // by default the FindGame button should be disabled until a connection to the Hub is made
             // but username textbox is enabled until game has started
-            $('#findGame').attr('disabled', 'disabled');
+            disableInput();
             $('#username').removeAttr('disabled');
+
+            // CLIENT STATE
+            // The ID of this player
+            var playerId;
 
             // keep a reference to the hub
             var gameHub = $.connection.gameHub;
 
             // CLIENT METHODS
             // Prevent players from joining again
-            gameHub.client.playerJoined = function () {
-                $('#status').html("Player joined");
-                $('#username').attr('disabled', 'disabled');
-                $('#findGame').attr('disabled', 'disabled');
+            gameHub.client.playerJoined = function (player) {
+                playerId = player.Id;
+                disableInput();
             };
 
-            // The opponent left so game is over
+            // The opponent left so game is over and allow player to find a new game
             gameHub.client.opponentLeft = function () {
                 $('#status').html("Opponent has left. Game over.");
                 endGame();
             };
+
+            // Notify player that they are in a waiting pool for another opponent
+            gameHub.client.waitingList = function () {
+                $('#status').html("Waiting for an opponent.");
+            };
+
+            // Starts a new game
+            gameHub.client.start = function (game) {
+                $('#status').html("Game started");
+            }
 
             // CLIENT BEHAVIORS
             // Call server to find a game if button is clicked
@@ -150,17 +163,32 @@
                 return true;
             });
 
-            // Game over business logic should disable board button handlers
+            // Enables username and find game inputs
+            function enableInput() {
+                $('#username').removeAttr('disabled');
+                $('#findGame').removeAttr('disabled');
+                $('#username').focus();
+            };
+
+            // Disables username and find game inputs
+            function disableInput() {
+                $('#username').attr('disabled', 'disabled');
+                $('#findGame').attr('disabled', 'disabled');
+            };
+
+            // Game over business logic should disable board button handlers and 
+            // allow player to join a new game
             function endGame() {
                 // Remove click handlers from board positions
                 $('td[id^=pos-]').off('click');
+                enableInput();
             }
 
             // Open a connection to the server hub
             $.connection.hub.logging = true; // Enable client side logging
             $.connection.hub.start().done(function () {
                 // Enable the find game button
-                $('#findGame').removeAttr('disabled');
+                enableInput();
             });
         });
     </script>

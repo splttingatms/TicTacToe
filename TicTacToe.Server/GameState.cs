@@ -38,11 +38,10 @@ namespace TicTacToe.Server
             new ConcurrentDictionary<string, Game>(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
-        /// A queue of games that do not have a full party yet. Players looking for games 
-        /// should join these pending games.
+        /// A queue of players that are waiting for an opponent.
         /// </summary>
-        private readonly ConcurrentQueue<Game> pendingGames =
-            new ConcurrentQueue<Game>();
+        private readonly ConcurrentQueue<Player> waitingPlayers =
+            new ConcurrentQueue<Player>();
 
         private GameState(IHubContext context)
         {
@@ -74,7 +73,13 @@ namespace TicTacToe.Server
         /// <returns>The found player; otherwise null.</returns>
         public Player GetPlayer(string playerId)
         {
-            return this.players[playerId];
+            Player foundPlayer;
+            if (!this.players.TryGetValue(playerId, out foundPlayer))
+            {
+                return null;
+            }
+
+            return foundPlayer;
         }
 
         /// <summary>
@@ -101,11 +106,27 @@ namespace TicTacToe.Server
         }
 
         /// <summary>
+        /// Retrieves a game waiting for players.
+        /// </summary>
+        /// <returns>Returns a pending game if any; otherwise returns null.</returns>
+        public Player GetWaitingOpponent()
+        {
+            Player foundPlayer;
+            if (!this.waitingPlayers.TryDequeue(out foundPlayer))
+            {
+                return null;
+            }
+
+            return foundPlayer;
+        }
+
+        /// <summary>
         /// Forgets the specified game. Use if the game is over.
+        /// No need to manually remove a user from a group when the connection ends.
         /// </summary>
         /// <param name="gameId">The unique identifier of the game.</param>
         /// <returns>A task to track the asynchronous method execution.</returns>
-        public async Task RemoveGame(string gameId)
+        public void RemoveGame(string gameId)
         {
             // Remove the game
             Game foundGame;
@@ -114,14 +135,37 @@ namespace TicTacToe.Server
                 throw new InvalidOperationException("Game not found.");
             }
 
-            // Remove the players from the group
-            await this.Groups.Remove(foundGame.Player1.Id, foundGame.Id);
-            await this.Groups.Remove(foundGame.Player2.Id, foundGame.Id);
-
             // Remove the players, best effort
             Player foundPlayer;
             this.players.TryRemove(foundGame.Player1.Id, out foundPlayer);
             this.players.TryRemove(foundGame.Player2.Id, out foundPlayer);
+        }
+
+        /// <summary>
+        /// Adds specified player to the waiting pool.
+        /// </summary>
+        /// <param name="player">The player to add to waiting pool.</param>
+        public void AddToWaitingPool(Player player)
+        {
+            this.waitingPlayers.Enqueue(player);
+        }
+
+        /// <summary>
+        /// Creates a new pending game which will be waiting for more players.
+        /// </summary>
+        /// <param name="joiningPlayer">The first player to enter the game.</param>
+        /// <returns>The newly created game in a pending state.</returns>
+        public async Task<Game> CreateGame(Player firstPlayer, Player secondPlayer)
+        {
+            // Define the new game and add to waiting pool
+            Game game = new Game(firstPlayer, secondPlayer);
+            this.games[game.Id] = game;
+
+            // Create a new group to manage communication using ID as group name
+            await this.Groups.Add(firstPlayer.Id, groupName: game.Id);
+            await this.Groups.Add(secondPlayer.Id, groupName: game.Id);
+
+            return game;
         }
     }
 }

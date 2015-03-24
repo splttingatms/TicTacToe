@@ -8,11 +8,20 @@ namespace TicTacToe.Server.Models
 {
     public class Game
     {
-        public Game(Player player1, Player player2, string id)
+        /// <summary>
+        /// Creates a new game object.
+        /// </summary>
+        /// <param name="player1">The first player to join the game.</param>
+        /// <param name="player2">The second player to join the game.</param>
+        public Game(Player player1, Player player2)
         {
             this.Player1 = player1;
             this.Player2 = player2;
-            this.Id = id;
+            this.Id = Guid.NewGuid().ToString("d");
+
+            // Link the players to the game as well
+            this.Player1.GameId = this.Id;
+            this.Player2.GameId = this.Id;
         }
 
         /// <summary>
