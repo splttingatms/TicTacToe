@@ -126,13 +126,27 @@
             gameHub.client.start = function (game) {
                 $('#status').html("Game started");
 
-                // compile the template and render the board
-                var template = Handlebars.compile($('#board-template').html());
-                $('#board').html(template(game.Board));
+                buildBoard(game.Board);
 
                 // notify the player whose turn it is
-                displayTurn(game);
-            }
+                displayTurn(game.WhoseTurn);
+            };
+
+            // Handles the case where a user tried to place a piece not on their turn
+            gameHub.client.notPlayersTurn = function () {
+                $('#status').html("Please wait your turn.");
+            };
+
+            // A piece has been placed on the board
+            gameHub.client.piecePlaced = function (row, col, piece) {
+                $('#pos-' + row + '-' + col).html(piece);
+            };
+
+            // TODO: can be combined with piecePlaced by having the server
+            // send the whole game object, render the board and update in one method
+            gameHub.client.updateTurn = function (game) {
+                displayTurn(game.WhoseTurn);
+            };
 
             // CLIENT BEHAVIORS
             // Call server to find a game if button is clicked
@@ -173,12 +187,28 @@
             };
 
             // Display whose turn it is
-            function displayTurn(game) {
-                if (playerId == game.WhoseTurn) {
+            function displayTurn(idOfPlayersTurn) {
+                if (playerId == idOfPlayersTurn) {
                     $('#status').html("Your turn");
                 } else {
                     $('#status').html("Opponent's turn");
                 }
+            };
+
+            // Build and display the board
+            function buildBoard(board) {
+                var template = Handlebars.compile($('#board-template').html());
+                $('#board').html(template(board));
+
+                // attach click handlers to each position
+                $('td[id^=pos-]').click(function (e) {
+                    e.preventDefault();
+                    var id = this.id; // "pos-0-0"
+                    var parts = id.split("-"); // [pos, 0, 0]
+                    var row = parts[1];
+                    var col = parts[2];
+                    gameHub.server.placePiece(row, col);
+                });
             };
 
             // Open a connection to the server hub

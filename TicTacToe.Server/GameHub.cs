@@ -37,7 +37,31 @@ namespace TicTacToe.Server
                 Game newGame = await GameState.Instance.CreateGame(opponent, joiningPlayer);
                 Clients.Group(newGame.Id).start(newGame);
             }
+        }
 
+        /// <summary>
+        /// Client has requested to place a piece down in the following position.
+        /// </summary>
+        /// <param name="row">The row part of the position.</param>
+        /// <param name="col">The column part of the position.</param>
+        /// <returns>A Task to track the asynchronous method execution.<</returns>
+        public async Task PlacePiece(int row, int col)
+        {
+            Player playerMakingTurn = GameState.Instance.GetPlayer(playerId: this.Context.ConnectionId);
+            Player opponent;
+            Game game = GameState.Instance.GetGame(playerMakingTurn, out opponent);
+
+            // TODO: should the game check if it is the players turn?
+            if (game == null || game.WhoseTurn != playerMakingTurn.Id)
+            {
+                this.Clients.Caller.notPlayersTurn();
+                return;
+            }
+
+            // Notify everyone of the valid move. Only send what is necessary (instead of sending whole board)
+            game.PlacePiece(row, col);
+            this.Clients.Group(game.Id).piecePlaced(row, col, playerMakingTurn.Piece);
+            this.Clients.Group(game.Id).updateTurn(game);
             await Task.Factory.StartNew(() => { });
         }
 

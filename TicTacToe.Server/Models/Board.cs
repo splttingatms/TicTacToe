@@ -18,6 +18,11 @@ namespace TicTacToe.Server.Models
             this.Pieces = new string[3, 3];
         }
 
+        public void PlacePiece(int row, int col, string pieceToPlace)
+        {
+            this.Pieces[row, col] = pieceToPlace;
+        }
+
         public override string ToString()
         {
             return string.Join(", ", this.Pieces);

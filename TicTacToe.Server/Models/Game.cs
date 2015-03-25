@@ -27,6 +27,10 @@ namespace TicTacToe.Server.Models
             // Link the players to the game as well
             this.Player1.GameId = this.Id;
             this.Player2.GameId = this.Id;
+
+            // Assign piece types to each player
+            this.Player1.Piece = "X";
+            this.Player2.Piece = "O";
         }
 
         /// <summary>
@@ -61,6 +65,22 @@ namespace TicTacToe.Server.Models
                     this.Player1.Id :
                     this.Player2.Id;
             }
+        }
+
+        /// <summary>
+        /// Places a piece on the board. The game knows whose turn it is so no need
+        /// to identify the player. Will also update whose turn it is.
+        /// </summary>
+        /// <param name="row">The row where the piece will be placed.</param>
+        /// <param name="col">The column where the piece will be placed.</param>
+        public void PlacePiece(int row, int col)
+        {
+            string pieceToPlace = this.isFirstPlayersTurn ?
+                this.Player1.Piece :
+                this.Player2.Piece;
+            this.Board.PlacePiece(row, col, pieceToPlace);
+            
+            this.isFirstPlayersTurn = !this.isFirstPlayersTurn;
         }
 
         public override string ToString()
