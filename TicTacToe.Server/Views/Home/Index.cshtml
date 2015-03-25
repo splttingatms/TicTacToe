@@ -20,8 +20,8 @@
     <style>
         /* undo bootstrap so that textbox is inline with button */
         #username {
-            width: initial;
-            display: initial;
+            width: auto;
+            display: inline;
         }
 
         table {
@@ -58,7 +58,7 @@
                 {{#each Pieces}}
                 <tr>
                     {{#each this}}
-                    <td id="pos-{{@@../index}}-{{@@index}}"></td>
+                    <td id="pos-{{@@../index}}-{{@@index}}">{{this}}</td>
                     {{/each}}
                 </tr>
                 {{/each}}
@@ -73,25 +73,6 @@
         <p id="status" class="help-block">Please enter your desired username.</p>
 
         <div id="board">
-            <table>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
         </div>
     </main>
 
@@ -144,6 +125,13 @@
             // Starts a new game
             gameHub.client.start = function (game) {
                 $('#status').html("Game started");
+
+                // compile the template and render the board
+                var template = Handlebars.compile($('#board-template').html());
+                $('#board').html(template(game.Board));
+
+                // notify the player whose turn it is
+                displayTurn(game);
             }
 
             // CLIENT BEHAVIORS
@@ -182,7 +170,16 @@
                 // Remove click handlers from board positions
                 $('td[id^=pos-]').off('click');
                 enableInput();
-            }
+            };
+
+            // Display whose turn it is
+            function displayTurn(game) {
+                if (playerId == game.WhoseTurn) {
+                    $('#status').html("Your turn");
+                } else {
+                    $('#status').html("Opponent's turn");
+                }
+            };
 
             // Open a connection to the server hub
             $.connection.hub.logging = true; // Enable client side logging

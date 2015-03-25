@@ -8,6 +8,8 @@ namespace TicTacToe.Server.Models
 {
     public class Game
     {
+        private bool isFirstPlayersTurn;
+
         /// <summary>
         /// Creates a new game object.
         /// </summary>
@@ -18,6 +20,9 @@ namespace TicTacToe.Server.Models
             this.Player1 = player1;
             this.Player2 = player2;
             this.Id = Guid.NewGuid().ToString("d");
+            this.Board = new Board();
+
+            this.isFirstPlayersTurn = true;
 
             // Link the players to the game as well
             this.Player1.GameId = this.Id;
@@ -39,10 +44,29 @@ namespace TicTacToe.Server.Models
         /// </summary>
         public Player Player2 { get; set; }
 
+        /// <summary>
+        /// The board that represents the tic-tac-toe game.
+        /// </summary>
+        public Board Board { get; set; }
+
+        /// <summary>
+        /// Returns which player is currently allowed to place a piece down.
+        /// Returns the player's ID to prevent large payloads when serialized.
+        /// </summary>
+        public string WhoseTurn
+        {
+            get
+            {
+                return (this.isFirstPlayersTurn) ?
+                    this.Player1.Id :
+                    this.Player2.Id;
+            }
+        }
+
         public override string ToString()
         {
-            return String.Format("(Id={0}, Player1={1}, Player2={2})",
-                this.Id, this.Player1, this.Player2);
+            return String.Format("(Id={0}, Player1={1}, Player2={2}, Board={3})",
+                this.Id, this.Player1, this.Player2, this.Board);
         }
     }
 }
