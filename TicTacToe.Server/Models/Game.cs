@@ -75,7 +75,18 @@ namespace TicTacToe.Server.Models
         {
             get
             {
-                return !this.Board.AreSpacesLeft || this.Board.IsThreeInRow;
+                return this.IsTie || this.Board.IsThreeInRow;
+            }
+        }
+
+        /// <summary>
+        /// Returns whether the game is a tie.
+        /// </summary>
+        public bool IsTie
+        {
+            get
+            {
+                return !this.Board.AreSpacesLeft;
             }
         }
 

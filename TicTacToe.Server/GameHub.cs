@@ -76,7 +76,19 @@ namespace TicTacToe.Server
             }
             else
             {
-                this.Clients.Group(game.Id).gameOver();
+                // Determine how the game is over in order to display correct message to client
+                if (game.IsTie)
+                {
+                    // Cat's game
+                    this.Clients.Group(game.Id).tieGame();
+                }
+                else
+                {
+                    // Player outright won
+                    this.Clients.Group(game.Id).winner(playerMakingTurn.Name);
+                }
+                
+                // Remove the game (in any game over scenario) to reclaim resources
                 GameState.Instance.RemoveGame(game.Id);
             }
         }

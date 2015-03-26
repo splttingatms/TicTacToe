@@ -149,9 +149,15 @@
                 displayTurn(game.WhoseTurn);
             };
 
-            // Handle the game over scenario
-            gameHub.client.gameOver = function () {
-                $('#status').html("Game over.");
+            // Handle the tie game - game over scenario
+            gameHub.client.tieGame = function () {
+                $('#status').html("Tie!");
+                endGame();
+            };
+
+            // Handle the tie game - game over scenario
+            gameHub.client.winner = function (playerName) {
+                $('#status').html("Winner: " + playerName);
                 endGame();
             };
 
