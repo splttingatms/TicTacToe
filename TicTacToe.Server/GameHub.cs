@@ -18,6 +18,12 @@ namespace TicTacToe.Server
         /// <returns>A Task to track the asynchronous method execution.</returns>
         public async Task FindGame(string username)
         {
+            if (GameState.Instance.IsUsernameTaken(username))
+            {
+                this.Clients.Caller.usernameTaken();
+                return;
+            }
+
             Player joiningPlayer = 
                 GameState.Instance.CreatePlayer(username, this.Context.ConnectionId);
             this.Clients.Caller.playerJoined(joiningPlayer);

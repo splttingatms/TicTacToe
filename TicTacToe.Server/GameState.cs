@@ -151,6 +151,16 @@ namespace TicTacToe.Server
         }
 
         /// <summary>
+        /// Determines if the username is already taken, ignoring case.
+        /// </summary>
+        /// <param name="username">The username to check.</param>
+        /// <returns>true if another player shares the same username; otherwise false.</returns>
+        public bool IsUsernameTaken(string username)
+        {
+            return this.players.Values.FirstOrDefault(player => player.Name.Equals(username, StringComparison.InvariantCultureIgnoreCase)) != null;
+        }
+
+        /// <summary>
         /// Creates a new pending game which will be waiting for more players.
         /// </summary>
         /// <param name="joiningPlayer">The first player to enter the game.</param>
