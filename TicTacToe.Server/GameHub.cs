@@ -45,7 +45,7 @@ namespace TicTacToe.Server
         /// <param name="row">The row part of the position.</param>
         /// <param name="col">The column part of the position.</param>
         /// <returns>A Task to track the asynchronous method execution.<</returns>
-        public async Task PlacePiece(int row, int col)
+        public void PlacePiece(int row, int col)
         {
             Player playerMakingTurn = GameState.Instance.GetPlayer(playerId: this.Context.ConnectionId);
             Player opponent;
@@ -61,8 +61,17 @@ namespace TicTacToe.Server
             // Notify everyone of the valid move. Only send what is necessary (instead of sending whole board)
             game.PlacePiece(row, col);
             this.Clients.Group(game.Id).piecePlaced(row, col, playerMakingTurn.Piece);
-            this.Clients.Group(game.Id).updateTurn(game);
-            await Task.Factory.StartNew(() => { });
+
+            // check if game is over (won or tie)
+            if (!game.IsOver)
+            {
+                // Update the turn like normal if the game is still ongoing
+                this.Clients.Group(game.Id).updateTurn(game);
+            }
+            else
+            {
+                this.Clients.Group(game.Id).gameOver();
+            }
         }
 
         /// <summary>

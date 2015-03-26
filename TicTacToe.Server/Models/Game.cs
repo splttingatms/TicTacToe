@@ -68,6 +68,18 @@ namespace TicTacToe.Server.Models
         }
 
         /// <summary>
+        /// Returns whether the game is ongoing or has completed.
+        /// Over states include either a tie or a player has won.
+        /// </summary>
+        public bool IsOver
+        {
+            get
+            {
+                return !this.Board.AreSpacesLeft || this.Board.IsThreeInRow;
+            }
+        }
+
+        /// <summary>
         /// Places a piece on the board. The game knows whose turn it is so no need
         /// to identify the player. Will also update whose turn it is.
         /// </summary>

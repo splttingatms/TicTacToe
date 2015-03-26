@@ -122,13 +122,9 @@
                 $('#status').html("Waiting for an opponent.");
             };
 
-            // Starts a new game
+            // Starts a new game by displaying the board and showing whose turn it is
             gameHub.client.start = function (game) {
-                $('#status').html("Game started");
-
                 buildBoard(game.Board);
-
-                // notify the player whose turn it is
                 displayTurn(game.WhoseTurn);
             };
 
@@ -146,6 +142,11 @@
             // send the whole game object, render the board and update in one method
             gameHub.client.updateTurn = function (game) {
                 displayTurn(game.WhoseTurn);
+            };
+
+            // Handle the game over scenario
+            gameHub.client.gameOver = function () {
+                $('#status').html("Game over.");
             };
 
             // CLIENT BEHAVIORS
