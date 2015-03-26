@@ -55,15 +55,14 @@ namespace TicTacToe.Server.Models
 
         /// <summary>
         /// Returns which player is currently allowed to place a piece down.
-        /// Returns the player's ID to prevent large payloads when serialized.
         /// </summary>
-        public string WhoseTurn
+        public Player WhoseTurn
         {
             get
             {
                 return (this.isFirstPlayersTurn) ?
-                    this.Player1.Id :
-                    this.Player2.Id;
+                    this.Player1 :
+                    this.Player2;
             }
         }
 

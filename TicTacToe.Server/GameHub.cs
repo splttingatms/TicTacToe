@@ -52,7 +52,7 @@ namespace TicTacToe.Server
             Game game = GameState.Instance.GetGame(playerMakingTurn, out opponent);
 
             // TODO: should the game check if it is the players turn?
-            if (game == null || game.WhoseTurn != playerMakingTurn.Id)
+            if (game == null || !game.WhoseTurn.Equals(playerMakingTurn))
             {
                 this.Clients.Caller.notPlayersTurn();
                 return;

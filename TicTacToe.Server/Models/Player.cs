@@ -44,5 +44,22 @@ namespace TicTacToe.Server.Models
             return String.Format("(Id={0}, Name={1}, GameId={2}, Piece={3})", 
                 this.Id, this.Name, this.GameId, this.Piece);
         }
+
+        public override bool Equals(object obj)
+        {
+            Player other = obj as Player;
+
+            if (other == null)
+            {
+                return false;
+            }
+
+            return this.Id.Equals(other.Id) && this.Name.Equals(other.Name);
+        }
+
+        public override int GetHashCode()
+        {
+            return this.Id.GetHashCode() * this.Name.GetHashCode();
+        }
     }
 }

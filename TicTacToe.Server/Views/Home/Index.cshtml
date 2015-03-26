@@ -125,7 +125,9 @@
             // Starts a new game by displaying the board and showing whose turn it is
             gameHub.client.start = function (game) {
                 buildBoard(game.Board);
-                displayTurn(game.WhoseTurn);
+                var opponent = getOpponent(game);
+                displayOpponent(opponent);
+                displayTurn(game.WhoseTurn, true);
             };
 
             // Handles the case where a user tried to place a piece not on their turn
@@ -200,12 +202,25 @@
             };
 
             // Display whose turn it is
-            function displayTurn(idOfPlayersTurn) {
-                if (playerId == idOfPlayersTurn) {
-                    $('#status').html("Your turn");
+            function displayTurn(playersTurn, isDisplayingOpponent) {
+                var turnMessage = "";
+                if (playerId == playersTurn.Id) {
+                    turnMessage = "Your turn";
                 } else {
-                    $('#status').html("Opponent's turn");
+                    turnMessage = playersTurn.Name + "\'s turn";
                 }
+
+                // Do not overwrite opponent's name if it is being displayed
+                if (isDisplayingOpponent) {
+                    $('#status').html($('#status').html() + turnMessage);
+                } else {
+                    $('#status').html(turnMessage);
+                }
+            };
+
+            // Displays the opponents name
+            function displayOpponent(opponent) {
+                $('#status').html("You are playing against " + opponent.Name + "<br />");
             };
 
             // Build and display the board
@@ -222,6 +237,15 @@
                     var col = parts[2];
                     gameHub.server.placePiece(row, col);
                 });
+            };
+
+            // Retrieves the opponent player from the game
+            function getOpponent(game) {
+                if (playerId == game.Player1.Id) {
+                    return game.Player2;
+                } else {
+                    return game.Player1;
+                }
             };
 
             // Open a connection to the server hub
