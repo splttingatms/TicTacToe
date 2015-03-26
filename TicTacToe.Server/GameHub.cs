@@ -71,6 +71,7 @@ namespace TicTacToe.Server
             else
             {
                 this.Clients.Group(game.Id).gameOver();
+                GameState.Instance.RemoveGame(game.Id);
             }
         }
 
