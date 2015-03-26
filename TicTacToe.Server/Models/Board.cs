@@ -18,6 +18,7 @@ namespace TicTacToe.Server.Models
 
         public Board()
         {
+            // TODO: Make the dimensions of the board constants
             this.Pieces = new string[3, 3];
         }
 

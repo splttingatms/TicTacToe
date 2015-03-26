@@ -95,6 +95,23 @@ namespace TicTacToe.Server.Models
             this.isFirstPlayersTurn = !this.isFirstPlayersTurn;
         }
 
+        /// <summary>
+        /// Returns whether or not the specified move is valid.
+        /// A move is invalid if there is already a piece placed in the location or
+        /// the move is off the board.
+        /// </summary>
+        /// <param name="row">The row position of the move.</param>
+        /// <param name="col">The column position of the move.</param>
+        /// <returns>true if the move is valid; otherwise false.</returns>
+        public bool IsValidMove(int row, int col)
+        {
+            // TODO: Make the board dimensions public properties
+            return 
+                row < this.Board.Pieces.GetLength(0) &&
+                col < this.Board.Pieces.GetLength(1) &&
+                string.IsNullOrWhiteSpace(this.Board.Pieces[row, col]);
+        }
+
         public override string ToString()
         {
             return String.Format("(Id={0}, Player1={1}, Player2={2}, Board={3})",

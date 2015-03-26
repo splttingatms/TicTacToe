@@ -58,6 +58,12 @@ namespace TicTacToe.Server
                 return;
             }
 
+            if (!game.IsValidMove(row, col))
+            {
+                this.Clients.Caller.notValidMove();
+                return;
+            }
+
             // Notify everyone of the valid move. Only send what is necessary (instead of sending whole board)
             game.PlacePiece(row, col);
             this.Clients.Group(game.Id).piecePlaced(row, col, playerMakingTurn.Piece);
